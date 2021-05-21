@@ -1,0 +1,10 @@
+faces:
+  image: boostingflaskimg
+  container_name: boostingflask
+  restart: always
+  ports:
+    - 60008:5000
+  volumes:
+    - ./boosting_flask:/app
+  environment:
+    - FLASK_ENV=production

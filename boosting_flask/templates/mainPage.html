@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Train your perfect LightGBM baseline</title>
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bs-custom-file-input/dist/bs-custom-file-input.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            bsCustomFileInput.init()
+        });
+    </script>
+    <link crossorigin="anonymous"
+          href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+          integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"
+          rel="stylesheet">
+    <link href="{{ url_for('static',filename='css/mainPage.css') }}" rel="stylesheet">
+</head>
+
+<body>
+
+<div class="container shadow min-vh-100 py-5">
+    <div class="p-3 mb-2 bg-info text-white">
+        <div class="form mb-3">
+            <div class="card">
+                <div class="card-header text-center" style="color: black !important">
+                    <h3>Train your perfect LightGBM baseline</h3>
+                    <h4>Please use small dataset for demonstration</h4>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+
+            <div class="col-sm-8">
+                <form enctype="multipart/form-data" method="POST">
+                    <div class="col-sm-10 mb-3">
+                        <div class="custom-file">
+                            <input class="custom-file-input" id="customTrain" name="csvTrain" required type="file">
+                            <label class="custom-file-label" for="customTrain">Choose csv train file with
+                                preprocessed dataset</label>
+                        </div>
+                    </div>
+
+                    <div class="col-sm-10 mb-3">
+                        <label for="formGroupExampleInput">Type your target column name</label>
+                        <input class="form-control" id="formGroupExampleInput" name="targetColumn"
+                               placeholder="Target column name (case sensitive)" required type="text">
+                    </div>
+
+                    <fieldset class="form-group col-md-12">
+                        <div class="row">
+                            <legend class="col-form-label col-sm-2 pt-0">Task type</legend>
+                            <div class="col-sm-10">
+                                <div class="form-check">
+                                    <input class="form-check-input" id="gridType1" name="gridType"
+                                           required type="radio" value="regression">
+                                    <label class="form-check-label" for="gridType1">
+                                        Regression
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" id="gridType2" name="gridType"
+                                           required type="radio" value="binary">
+                                    <label class="form-check-label" for="gridType2">
+                                        Binary Classification
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" id="gridType3" name="gridType"
+                                           required type="radio" value="multiclassova">
+                                    <label class="form-check-label" for="gridType3">
+                                        Multi-class Classification
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </fieldset>
+
+                    <fieldset class="form-group col-md-12">
+                        <div class="row">
+                            <legend class="col-form-label col-sm-2 pt-0">Is data mostly balanced?</legend>
+                            <div class="col-sm-10">
+                                <div class="form-check">
+                                    <input class="form-check-input" id="gridBalance1" name="gridBalance" required
+                                           type="radio" value="balanced">
+                                    <label class="form-check-label" for="gridBalance1">
+                                        Balanced
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" id="gridBalance2" name="gridBalance" required
+                                           type="radio" value="unbalanced">
+                                    <label class="form-check-label" for="gridBalance2">
+                                        Unbalanced (only for classification tasks)
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </fieldset>
+
+                    <fieldset class="form-group col-md-12">
+                        <div class="row">
+                            <legend class="col-form-label col-sm-2 pt-0">Choose regression metrics</legend>
+                            <div class="col-sm-10">
+                                <div class="form-check">
+                                    <input class="form-check-input" id="regressionMetric1"
+                                           name="regressionMetrics" type="checkbox"
+                                           value="mse">
+                                    <label class="form-check-label" for="regressionMetric1">
+                                        MSE
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" id="regressionMetric2"
+                                           name="regressionMetrics" type="checkbox"
+                                           value="rmse">
+                                    <label class="form-check-label" for="regressionMetric2">
+                                        RMSE
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" id="regressionMetric3"
+                                           name="regressionMetrics" type="checkbox"
+                                           value="mae">
+                                    <label class="form-check-label" for="regressionMetric3">
+                                        MAE
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </fieldset>
+
+                    <fieldset class="form-group col-md-12">
+                        <div class="row">
+                            <legend class="col-form-label col-sm-2 pt-0">Or choose classification metrics</legend>
+                            <div class="col-sm-10">
+                                <div class="form-check">
+                                    <input class="form-check-input" id="classificationMetric3"
+                                           name="classificationMetrics" type="radio"
+                                           value="f1">
+                                    <label class="form-check-label" for="classificationMetric3">
+                                        F1-score Macro
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" id="classificationMetric4"
+                                           name="classificationMetrics" type="radio"
+                                           value="logloss">
+                                    <label class="form-check-label" for="classificationMetric4">
+                                        Logloss
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </fieldset>
+
+                    <div class="col-sm-10 mb-3">
+                        <div class="custom-file">
+                            <input class="custom-file-input" id="customTest" name="csvTest" type="file">
+                            <label class="custom-file-label" for="customTest">Choose csv test file if you
+                                need predictions</label>
+                        </div>
+                    </div>
+
+                    <fieldset class="form-group col-md-12">
+                        <div class="row">
+                            <legend class="col-form-label col-sm-2 pt-0">Should non-numeric columns be deleted?</legend>
+                            <div class="col-sm-10">
+                                <div class="form-check">
+                                    <input class="form-check-input" id="gridNumeric1" name="gridNumeric" required
+                                           type="radio" value="yes">
+                                    <label class="form-check-label" for="gridNumeric1">
+                                        Yes, delete and process
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" id="gridNumeric2" name="gridNumeric" required
+                                           type="radio" value="no">
+                                    <label class="form-check-label" for="gridNumeric2">
+                                        No, raise an error
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </fieldset>
+                    <button class="btn btn-primary" type="submit">Submit</button>
+                </form>
+
+
+            </div>
+
+            <div class="col-sm-4">
+                <div class="card">
+                    <img alt="Dataframe example" class="card-img-top" src="https://i.imgur.com/WABNOsu.png">
+                    <div class="card-header text-center" style="color: black !important">
+                        <h4>Instructions</h4>
+                    </div>
+                    <div class="card-body" style="color: black !important">
+                        <ul>
+                            <li>
+                                Ask your analyst to prepare dataframe in feature-target format
+                            </li>
+                            <li>
+                                Make all columns numeric, fill empty rows and deal with None
+                            </li>
+                            <li>
+                                If you have classification name your target values from 0 to n-1
+                            </li>
+                            <li>
+                                Save dataframe to .csv format
+                            </li>
+                            <li>
+                                Upload it in special field
+                            </li>
+                            <li>
+                                Specify parameters of training
+                            </li>
+                            <li>
+                                Receive your trained lgbm-model
+                            </li>
+                            <li>
+                                Upload test file if you need predictions
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
